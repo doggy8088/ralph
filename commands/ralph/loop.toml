@@ -19,8 +19,8 @@ You are now in a **persistent, self-correcting development loop**. You'll see yo
 self-referential loop where you iteratively improve on the same task. When you complete this turn, the **exact same prompt** (above) will be fed back to you automatically.
 
 **Loop Constraints:**
-- **Iteration Count**: Monitor `"current_iteration"` in `.gemini/ralph/state.json`. If `"max_iterations"` (if > 0) is reached, you must stop.
-- **Completion Promise**: If a `"completion_promise"` is defined in `.gemini/ralph/state.jsonn`, you must output `<promise>PROMISE_TEXT</promise>` when the task is genuinely complete.
+- **Iteration Count**: Monitor `"current_iteration"` in `.gemini/ralph/state.json`. If `"max_iterations"` (if > 0) is reached, you must stop. **DO NOT** increment this count yourself; the Ralph loop mechanism handles this automatically after each turn.
+- **Completion Promise**: If a `"completion_promise"` is defined in `.gemini/ralph/state.json`, you must output `<promise>PROMISE_TEXT</promise>` when the task is genuinely complete.
 - **Stop Hook**: A hook is active. If you try to exit before completion, you will be forced to continue.
 
 To stop manually, use `/ralph:cancel`.

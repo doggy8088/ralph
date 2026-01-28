@@ -72,7 +72,7 @@ jq -n \
     --arg started_at "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
     '{
         active: true,
-        current_iteration: 0,
+        current_iteration: 1,
         max_iterations: ($max | tonumber),
         completion_promise: $promise,
         original_prompt: $prompt,
@@ -86,7 +86,7 @@ Ralph is helping! I'm going in a circle!
 
 >> My Rules:
    - I can try $MAX_ITERATIONS times.
-   - I will stop if I find: <promise>${COMPLETION_PROMISE:-a shiny penny}</promise>
+   - I will stop if I find: <promise>${COMPLETION_PROMISE}</promise>
 
 >> My Thoughts:
    - $PROMPT

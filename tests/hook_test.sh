@@ -7,7 +7,7 @@ HOOK="./hooks/stop-hook.sh"
 
 setup() {
     mkdir -p .gemini/ralph
-    jq -n '{active: true, current_iteration: 0, max_iterations: 5, completion_promise: "", original_prompt: "Task", started_at: "2026-01-27T12:00:00Z"}' > "$STATE_FILE"
+    jq -n '{active: true, current_iteration: 1, max_iterations: 5, completion_promise: "", original_prompt: "Task", started_at: "2026-01-27T12:00:00Z"}' > "$STATE_FILE"
 }
 
 assert_json_value() {
@@ -24,7 +24,7 @@ echo "Running Test 1: Iteration increment..."
 setup
 # Simulate AfterAgent hook input
 RESPONSE=$(echo '{"prompt_response": "Some response"}' | "$HOOK")
-assert_json_value ".current_iteration" "1"
+assert_json_value ".current_iteration" "2"
 if [[ $(echo "$RESPONSE" | jq -r '.systemMessage') != "🔄 Ralph is starting iteration 2..." ]]; then
     echo "FAIL: Expected systemMessage to be '🔄 Ralph is starting iteration 2...', but got '$(echo "$RESPONSE" | jq -r '.systemMessage')'"
     exit 1
@@ -32,8 +32,8 @@ fi
 
 echo "Running Test 2: Termination (Max Iterations)..."
 setup
-# Set current_iteration to 4, max_iterations is 5
-jq '.current_iteration = 4' "$STATE_FILE" > "${STATE_FILE}.tmp" && mv "${STATE_FILE}.tmp" "$STATE_FILE"
+# Set current_iteration to 5, max_iterations is 5
+jq '.current_iteration = 5' "$STATE_FILE" > "${STATE_FILE}.tmp" && mv "${STATE_FILE}.tmp" "$STATE_FILE"
 # This turn (5th) should trigger termination
 RESPONSE=$(echo '{"prompt_response": "Last response"}' | "$HOOK")
 assert_json_value ".current_iteration" "5"

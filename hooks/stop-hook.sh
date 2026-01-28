@@ -54,12 +54,7 @@ if [[ -n "$COMPLETION_PROMISE" ]] && [[ "$LAST_MESSAGE" == *"<promise>$COMPLETIO
     exit 0
 fi
 
-# Increment iteration
-TMP_STATE=$(mktemp)
-jq '.current_iteration += 1' "$STATE_FILE" > "$TMP_STATE" || die "Failed to increment iteration"
-mv "$TMP_STATE" "$STATE_FILE"
-
-# Load updated state
+# Load state
 STATE=$(cat "$STATE_FILE")
 CURRENT_ITERATION=$(echo "$STATE" | jq -r '.current_iteration')
 MAX_ITERATIONS=$(echo "$STATE" | jq -r '.max_iterations')
@@ -74,6 +69,12 @@ if [[ $CURRENT_ITERATION -ge $MAX_ITERATIONS ]]; then
     exit 0
 fi
 
+# Increment iteration
+NEW_ITERATION=$((CURRENT_ITERATION + 1))
+TMP_STATE=$(mktemp)
+jq ".current_iteration = $NEW_ITERATION" "$STATE_FILE" > "$TMP_STATE" || die "Failed to increment iteration"
+mv "$TMP_STATE" "$STATE_FILE"
+
 # Log progress (persona)
 log "I'm doing a circle! Iteration $CURRENT_ITERATION is done."
 
@@ -84,7 +85,7 @@ cat <<EOF
 {
   "decision": "deny",
   "reason": "$ORIGINAL_PROMPT",
-  "systemMessage": "🔄 Ralph is starting iteration $((CURRENT_ITERATION + 1))...",
+  "systemMessage": "🔄 Ralph is starting iteration $NEW_ITERATION...",
   "clearContext": true
 }
 EOF
