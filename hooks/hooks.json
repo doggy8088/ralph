@@ -7,7 +7,7 @@
           {
             "name": "ralph-loop",
             "type": "command",
-            "command": "${extensionPath}/hooks/after-agent-hook.sh",
+            "command": "${extensionPath}/hooks/stop-hook.sh",
             "description": "The Ralph infinite loop mechanism"
           }
         ]

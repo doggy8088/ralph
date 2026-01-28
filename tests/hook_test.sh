@@ -3,7 +3,7 @@
 # Licensed under the Apache License, Version 2.0
 
 STATE_FILE=".gemini/ralph/state.json"
-HOOK="./hooks/after-agent-hook.sh"
+HOOK="./hooks/stop-hook.sh"
 
 setup() {
     mkdir -p .gemini/ralph
