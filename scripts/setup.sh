@@ -13,13 +13,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Functions
+die() {
+  echo "❌ Error: $1" >&2
+  exit 1
+}
+
 # Setup paths
 STATE_DIR=".gemini/ralph"
 STATE_FILE="$STATE_DIR/state.json"
 PROGRESS_FILE="$STATE_DIR/progress.txt"
 
 # Ensure directory exists
-mkdir -p "$STATE_DIR"
+mkdir -p "$STATE_DIR" || die "Could not create state directory: $STATE_DIR"
 
 # Defaults
 MAX_ITERATIONS=5
@@ -31,7 +37,7 @@ if [[ $# -eq 1 ]]; then
     if [[ "$1" == "/ralph:loop"* ]] || [[ "$1" =~ ^- ]] || [[ "$1" =~ " --" ]]; then
         # Remove command prefix if present
         raw_args="${1#/ralph:loop }"
-        eval set -- "$raw_args"
+        eval set -- "$raw_args" || die "Failed to parse combined arguments"
     fi
 fi
 
@@ -72,7 +78,7 @@ jq -n \
         completion_promise: $promise,
         original_prompt: $prompt,
         started_at: $started_at
-    }' > "$STATE_FILE"
+    }' > "$STATE_FILE" || die "Failed to initialize state file: $STATE_FILE"
 
 # Initialize progress.txt
 echo "Ralph is starting a new loop for: $PROMPT" > "$PROGRESS_FILE"
