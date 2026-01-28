@@ -1,22 +1,26 @@
 description = "Start Ralph loop in current session."
 prompt = """
-Ralph is going to help you! I'm going in a circle!
+You are starting the Ralph loop.
 
-First, I need to set up my toys:
+**Step 1: Initialization**
+Run the setup script to initialize the loop state:
 ```bash
 bash "${extensionPath}/scripts/setup.sh" $ARGUMENTS
-```
 
-**Supported Arguments:**
-- `--max-iterations <N>`: How many times I should try (default is 5).
-- `--completion-promise <TEXT>`: What I should look for to know I'm done.
+**Supported Arguments for setup.sh:**
+- `--max-iterations <N>`: Maximum number of loop iterations.
+- `--completion-promise <TEXT>`: A text token that must be output to finish.
 
 **CRITICAL**: Pass the user's arguments **VERBATIM** to the script. Do not rename, reorder, or infer flags. If the user provides `--max-time`, pass `--max-time`.
 
-**Important Rules:**
-1. I will clear my memory after each turn so I don't get a headache!
-2. I will repeat your prompt to myself so I don't forget what I'm doing.
-3. If you want me to stop early, use `/ralph:cancel`.
+**Step 2: Execution (Management)**
+You are now in a **persistent, self-correcting development loop**. You'll see your previous work in files, creating a
+self-referential loop where you iteratively improve on the same task. When you complete this turn, the **exact same prompt** (above) will be fed back to you automatically.
 
-I'm starting now! I hope I don't run out of paste!
+**Loop Constraints:**
+- **Iteration Count**: Monitor `"current_iteration"` in `.gemini/ralph/state.json`. If `"max_iterations"` (if > 0) is reached, you must stop.
+- **Completion Promise**: If a `"completion_promise"` is defined in `.gemini/ralph/state.jsonn`, you must output `<promise>PROMISE_TEXT</promise>` when the task is genuinely complete.
+- **Stop Hook**: A hook is active. If you try to exit before completion, you will be forced to continue.
+
+To stop manually, use `/ralph:cancel`.
 """
