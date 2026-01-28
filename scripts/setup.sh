@@ -26,38 +26,35 @@ MAX_ITERATIONS=5
 COMPLETION_PROMISE=""
 PROMPT=""
 
-# Workaround for combined string invocation
-if [[ "$1" == "/ralph:loop"* ]]; then
-    # Re-tokenize the string while respecting basic quoting if possible
-    # For now, we use a simple approach to handle the most common cases
-    raw_args="${1#/ralph:loop }"
-    # Use eval to handle potential quotes in the single string
-    eval "ARGS=($raw_args)"
-else
-    ARGS=("$@")
+# Workaround for LLM tool invocation passing all args as a single string
+if [[ $# -eq 1 ]]; then
+    if [[ "$1" == "/ralph:loop"* ]] || [[ "$1" =~ ^- ]] || [[ "$1" =~ " --" ]]; then
+        # Remove command prefix if present
+        raw_args="${1#/ralph:loop }"
+        eval set -- "$raw_args"
+    fi
 fi
 
 # Parse arguments
-i=0
-while [[ $i -lt ${#ARGS[@]} ]]; do
-    case "${ARGS[$i]}" in
+while [[ $# -gt 0 ]]; do
+    case "$1" in
         --max-iterations)
-            MAX_ITERATIONS="${ARGS[$((i+1))]}"
-            i=$((i+2))
+            MAX_ITERATIONS="$2"
+            shift 2
             ;;
         --completion-promise)
-            COMPLETION_PROMISE="${ARGS[$((i+1))]}"
-            i=$((i+2))
+            COMPLETION_PROMISE="$2"
+            shift 2
             ;;
         *)
-            if [[ "${ARGS[$i]}" != -* ]]; then
+            if [[ "$1" != -* ]]; then
                 if [[ -z "$PROMPT" ]]; then
-                    PROMPT="${ARGS[$i]}"
+                    PROMPT="$1"
                 else
-                    PROMPT="$PROMPT ${ARGS[$i]}"
+                    PROMPT="$PROMPT $1"
                 fi
             fi
-            i=$((i+1))
+            shift 1
             ;;
     esac
 done
