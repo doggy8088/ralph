@@ -1,0 +1,28 @@
+name: Release Extension
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Create release asset
+        run: |
+          mkdir release
+          # Create a single generic archive for all platforms
+          # This works because Bash scripts/Markdown are platform-independent
+          tar -cvzf release/ralph.tar.gz --exclude='.git*' --exclude='.github*' .
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: release/ralph.tar.gz
+          generate_release_notes: true
