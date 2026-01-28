@@ -127,6 +127,26 @@ To prevent the agent from accidentally pushing code or performing destructive gi
 }
 ```
 
+## Uninstallation
+
+To uninstall Ralph, run:
+
+```bash
+gemini extensions uninstall ralph
+```
+
+### ⚠️ IMPORTANT: Cleanup Required
+
+After uninstalling, you **MUST** manually remove the following entry from your `~/.gemini/settings.json` file:
+
+```json
+  "context": {
+    "includeDirectories": ["~/.gemini/extensions/ralph"]
+  }
+```
+
+**If you fail to do this, the Gemini CLI will encounter an error on startup (as it will attempt to read a directory that no longer exists) and may not be able to finish initializing.**
+
 ## Future Ideas 🚀
 
 - **Rich Task Lists & Specs**: Support for structured specification files and rich task lists with metadata (priority, dependencies) per task.
