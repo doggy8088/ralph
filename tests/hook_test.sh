@@ -39,4 +39,16 @@ if [[ $(echo "$RESPONSE" | jq -r '.decision') != "allow" ]]; then
     exit 1
 fi
 
+echo "Running Test 3: Termination (Completion Promise)..."
+setup
+# Set completion_promise
+jq '.completion_promise = "DONE"' "$STATE_FILE" > "${STATE_FILE}.tmp" && mv "${STATE_FILE}.tmp" "$STATE_FILE"
+# Agent provides the promise
+RESPONSE=$(echo '{"prompt_response": "I am finished. <promise>DONE</promise>"}' | "$HOOK")
+assert_json_value ".active" "false"
+if [[ $(echo "$RESPONSE" | jq -r '.decision') != "allow" ]]; then
+    echo "FAIL: Expected decision to be 'allow' upon promise fulfillment"
+    exit 1
+fi
+
 echo "PASS: All tests passed!"

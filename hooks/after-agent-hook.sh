@@ -43,6 +43,17 @@ if [[ "$ACTIVE" != "true" ]]; then
     exit 0
 fi
 
+# Check for completion promise BEFORE incrementing/continuing
+COMPLETION_PROMISE=$(jq -r '.completion_promise' "$STATE_FILE")
+if [[ -n "$COMPLETION_PROMISE" ]] && [[ "$LAST_MESSAGE" == *"<promise>$COMPLETION_PROMISE</promise>"* ]]; then
+    TMP_STATE=$(mktemp)
+    jq '.active = false' "$STATE_FILE" > "$TMP_STATE"
+    mv "$TMP_STATE" "$STATE_FILE"
+    log "I found a shiny penny! It says $COMPLETION_PROMISE. The computer is sleeping now."
+    echo '{"decision": "allow", "systemMessage": "✅ Ralph found the completion promise: '"$COMPLETION_PROMISE"'"}'
+    exit 0
+fi
+
 # Increment iteration
 TMP_STATE=$(mktemp)
 jq '.current_iteration += 1' "$STATE_FILE" > "$TMP_STATE" || die "Failed to increment iteration"
