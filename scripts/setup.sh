@@ -45,10 +45,13 @@ fi
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --max-iterations=*)
-            MAX_ITERATIONS="${1#*=}"
+            val="${1#*=}"
+            [[ "$val" =~ ^[0-9]+$ ]] || die "Invalid iteration limit: '$val'"
+            MAX_ITERATIONS="$val"
             shift 1
             ;;
         --max-iterations)
+            [[ "${2:-}" =~ ^[0-9]+$ ]] || die "Invalid iteration limit: '${2:-}'"
             MAX_ITERATIONS="$2"
             shift 2
             ;;
@@ -57,6 +60,7 @@ while [[ $# -gt 0 ]]; do
             shift 1
             ;;
         --completion-promise)
+            [[ -n "${2:-}" ]] || die "Missing promise text."
             COMPLETION_PROMISE="$2"
             shift 2
             ;;
@@ -72,6 +76,9 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
+
+# Ensure a prompt was provided
+[[ -n "$PROMPT" ]] || die "No task specified. Run /ralph:help for usage."
 
 # Initialize state.json
 jq -n \
