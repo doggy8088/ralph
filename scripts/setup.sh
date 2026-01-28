@@ -83,5 +83,26 @@ jq -n \
 # Initialize progress.txt
 echo "Ralph is starting a new loop for: $PROMPT" > "$PROGRESS_FILE"
 
+# Ralph-style summary for the user and agent
+echo ""
+cat <<EOF
+Ralph is helping! I'm going in a circle!
+
+>> My Rules:
+   - I can try $MAX_ITERATIONS times.
+   - I will stop if I find: <promise>${COMPLETION_PROMISE:-a shiny penny}</promise>
+
+>> My Thoughts:
+   - $PROMPT
+
+I'm starting now! I hope I don't run out of paste!
+EOF
+
+if [[ -n "$COMPLETION_PROMISE" ]]; then
+  echo ""
+  echo "⚠️  RALPH IS LISTENING FOR A PROMISE"
+  echo "   You must say: <promise>$COMPLETION_PROMISE</promise>"
+fi
+
 # Output for persona (stderr)
 echo "Ralph is helping! I'm setting up my toys." >&2
