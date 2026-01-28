@@ -6,6 +6,7 @@ You are starting the Ralph loop.
 Run the setup script to initialize the loop state:
 ```bash
 bash "${extensionPath}/scripts/setup.sh" $ARGUMENTS
+```
 
 **Supported Arguments for setup.sh:**
 - `--max-iterations <N>`: Maximum number of loop iterations.
