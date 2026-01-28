@@ -13,4 +13,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# TODO: Implement cancel script
+# Setup paths
+STATE_DIR=".gemini/ralph"
+STATE_FILE="$STATE_DIR/state.json"
+
+if [[ -f "$STATE_FILE" ]]; then
+    rm -f "$STATE_FILE"
+    echo "Ralph: I've stopped my loop and cleaned up my toys." >&2
+else
+    echo "Ralph: I wasn't doing anything anyway!" >&2
+fi
+
+# Only remove directory if it is empty
+if [[ -d "$STATE_DIR" ]]; then
+    rmdir "$STATE_DIR" 2>/dev/null || true
+fi

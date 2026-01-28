@@ -3,10 +3,21 @@
 # Licensed under the Apache License, Version 2.0
 
 STATE_FILE=".gemini/ralph/state.json"
+STATE_DIR=".gemini/ralph"
 
 setup() {
     rm -f "$STATE_FILE"
 }
+
+cleanup() {
+    rm -f "$STATE_FILE"
+    # Only remove directory if it is empty
+    if [[ -d "$STATE_DIR" ]]; then
+        rmdir "$STATE_DIR" 2>/dev/null || true
+    fi
+}
+
+trap cleanup EXIT
 
 assert_exists() {
     if [[ ! -f "$1" ]]; then

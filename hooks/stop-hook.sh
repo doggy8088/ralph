@@ -30,6 +30,7 @@ STATE_FILE="$STATE_DIR/state.json"
 # Read hook input from stdin
 INPUT=$(cat)
 LAST_MESSAGE=$(echo "$INPUT" | jq -r '.prompt_response')
+CURRENT_PROMPT=$(echo "$INPUT" | jq -r '.prompt')
 
 # Check if loop is active
 if [[ ! -f "$STATE_FILE" ]]; then
@@ -37,7 +38,20 @@ if [[ ! -f "$STATE_FILE" ]]; then
     exit 0
 fi
 
+# Validate that this turn belongs to the Ralph loop
+ORIGINAL_PROMPT=$(jq -r '.original_prompt' "$STATE_FILE")
+if [[ "$CURRENT_PROMPT" != "$ORIGINAL_PROMPT" ]]; then
+    rm -f "$STATE_FILE"
+    # Only remove directory if it is empty
+    if [[ -d "$STATE_DIR" ]]; then
+        rmdir "$STATE_DIR" 2>/dev/null || true
+    fi
+    echo '{"decision": "allow"}'
+    exit 0
+fi
+
 ACTIVE=$(jq -r '.active' "$STATE_FILE")
+
 if [[ "$ACTIVE" != "true" ]]; then
     echo '{"decision": "allow"}'
     exit 0
@@ -46,9 +60,11 @@ fi
 # Check for completion promise BEFORE incrementing/continuing
 COMPLETION_PROMISE=$(jq -r '.completion_promise' "$STATE_FILE")
 if [[ -n "$COMPLETION_PROMISE" ]] && [[ "$LAST_MESSAGE" == *"<promise>$COMPLETION_PROMISE</promise>"* ]]; then
-    TMP_STATE=$(mktemp)
-    jq '.active = false' "$STATE_FILE" > "$TMP_STATE"
-    mv "$TMP_STATE" "$STATE_FILE"
+    rm -f "$STATE_FILE"
+    # Only remove directory if it is empty
+    if [[ -d "$STATE_DIR" ]]; then
+        rmdir "$STATE_DIR" 2>/dev/null || true
+    fi
     log "I found a shiny penny! It says $COMPLETION_PROMISE. The computer is sleeping now."
     echo '{"decision": "allow", "systemMessage": "✅ Ralph found the completion promise: '"$COMPLETION_PROMISE"'"}'
     exit 0
@@ -61,9 +77,11 @@ MAX_ITERATIONS=$(echo "$STATE" | jq -r '.max_iterations')
 
 # Check for max iterations
 if [[ $CURRENT_ITERATION -ge $MAX_ITERATIONS ]]; then
-    TMP_STATE=$(mktemp)
-    jq '.active = false' "$STATE_FILE" > "$TMP_STATE"
-    mv "$TMP_STATE" "$STATE_FILE"
+    rm -f "$STATE_FILE"
+    # Only remove directory if it is empty
+    if [[ -d "$STATE_DIR" ]]; then
+        rmdir "$STATE_DIR" 2>/dev/null || true
+    fi
     log "I'm tired. I've gone around $CURRENT_ITERATION times. The computer is sleeping now."
     echo '{"decision": "allow", "systemMessage": "✅ Ralph has reached the iteration limit."}'
     exit 0

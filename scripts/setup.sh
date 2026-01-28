@@ -84,20 +84,21 @@ echo ""
 cat <<EOF
 Ralph is helping! I'm going in a circle!
 
->> My Rules:
-   - I can try $MAX_ITERATIONS times.
-   - I will stop if I find: <promise>${COMPLETION_PROMISE}</promise>
-
->> My Thoughts:
-   - $PROMPT
+>> Config:
+   - Max Iterations: $( [[ $MAX_ITERATIONS -gt 0 ]] && echo "$MAX_ITERATIONS" || echo "∞" )
+   - Completion Promise: $( [[ "$COMPLETION_PROMISE" != "null" ]] && echo "$COMPLETION_PROMISE" || echo "None" )
+   - Original Prompt: $PROMPT
 
 I'm starting now! I hope I don't run out of paste!
+
+⚠️  WARNING: This loop will continue until the task is complete,
+    the iteration limit ($MAX_ITERATIONS) is reached, or a promise is fulfilled.
 EOF
 
 if [[ -n "$COMPLETION_PROMISE" ]]; then
   echo ""
-  echo "⚠️  RALPH IS LISTENING FOR A PROMISE"
-  echo "   You must say: <promise>$COMPLETION_PROMISE</promise>"
+  echo "⚠️  RALPH IS LISTENING FOR A PROMISE TO EXIT"
+  echo "   You must OUTPUT: <promise>$COMPLETION_PROMISE</promise>"
 fi
 
 # Output for persona (stderr)
