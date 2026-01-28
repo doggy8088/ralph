@@ -36,16 +36,25 @@ if [[ $# -eq 1 ]]; then
     if [[ "$1" == "/ralph:loop"* ]] || [[ "$1" =~ ^- ]] || [[ "$1" =~ " --" ]]; then
         # Remove command prefix if present
         raw_args="${1#/ralph:loop }"
-        eval set -- "$raw_args" || die "Failed to parse combined arguments"
+        # Use python to parse arguments safely and handle potential quoting issues
+        eval set -- "$(python3 -c 'import sys, shlex; print(" ".join(map(shlex.quote, shlex.split(sys.argv[1]))))' "$raw_args")" || die "Failed to parse combined arguments"
     fi
 fi
 
 # Parse arguments
 while [[ $# -gt 0 ]]; do
     case "$1" in
+        --max-iterations=*)
+            MAX_ITERATIONS="${1#*=}"
+            shift 1
+            ;;
         --max-iterations)
             MAX_ITERATIONS="$2"
             shift 2
+            ;;
+        --completion-promise=*)
+            COMPLETION_PROMISE="${1#*=}"
+            shift 1
             ;;
         --completion-promise)
             COMPLETION_PROMISE="$2"
@@ -91,7 +100,8 @@ Ralph is helping! I'm going in a circle!
 
 I'm starting now! I hope I don't run out of paste!
 
-⚠️  WARNING: This loop will continue the iteration limit ($MAX_ITERATIONS) is reached, or a promise is fulfilled.
+⚠️  WARNING: This loop will continue until the task is complete,
+    the iteration limit ($MAX_ITERATIONS) is reached, or a promise is fulfilled.
 EOF
 
 if [[ -n "$COMPLETION_PROMISE" ]]; then

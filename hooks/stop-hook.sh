@@ -58,7 +58,7 @@ if [[ "$CURRENT_PROMPT" != "$ORIGINAL_PROMPT" ]]; then
         if [[ -d "$STATE_DIR" ]]; then
             rmdir "$STATE_DIR" 2>/dev/null || true
         fi
-        echo "{\"decision\": \"allow\", \"systemMessage\": \"🚨 Ralph detected a prompt mismatch. Expected: '$CLEAN_ORIGINAL', Got: '$CLEAN_CURRENT'\"}"
+        echo "{\"decision\": \"allow\", \"systemMessage\": \"🚨 Ralph detected a prompt mismatch.\\nExpected: '$CLEAN_ORIGINAL'\\nGot:      '$CLEAN_CURRENT'\"}"
         exit 0
     fi
 fi

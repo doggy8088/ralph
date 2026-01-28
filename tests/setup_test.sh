@@ -66,4 +66,10 @@ setup
 assert_json_value ".original_prompt" "Solve 'The Riddle'"
 assert_json_value ".max_iterations" "3"
 
+echo "Running Test 5: Equality flag parsing (--flag=value)..."
+setup
+./scripts/setup.sh "Task" --max-iterations=15 --completion-promise=FINISH
+assert_json_value ".max_iterations" "15"
+assert_json_value ".completion_promise" "FINISH"
+
 echo "PASS: All tests passed!"
