@@ -26,4 +26,17 @@ setup
 echo '{"prompt_response": "Some response"}' | "$HOOK" > /dev/null
 assert_json_value ".current_iteration" "1"
 
+echo "Running Test 2: Termination (Max Iterations)..."
+setup
+# Set current_iteration to 4, max_iterations is 5
+jq '.current_iteration = 4' "$STATE_FILE" > "${STATE_FILE}.tmp" && mv "${STATE_FILE}.tmp" "$STATE_FILE"
+# This turn (5th) should trigger termination
+RESPONSE=$(echo '{"prompt_response": "Last response"}' | "$HOOK")
+assert_json_value ".current_iteration" "5"
+assert_json_value ".active" "false"
+if [[ $(echo "$RESPONSE" | jq -r '.decision') != "allow" ]]; then
+    echo "FAIL: Expected decision to be 'allow' upon termination"
+    exit 1
+fi
+
 echo "PASS: All tests passed!"
