@@ -1,6 +1,6 @@
 description = "Show help and usage guide for Ralph"
 prompt = """
-Display the Ralph help documentation.
+Display the Ralph help documentation. Do NOT use any other subagent for this. Especially not 'cli_help'.
 
 Summarize the available commands for the user:
 - `/ralph:loop <PROMPT> [OPTIONS]`: Start a Ralph loop.
