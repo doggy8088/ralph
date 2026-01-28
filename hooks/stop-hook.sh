@@ -41,21 +41,26 @@ fi
 # Validate that this turn belongs to the Ralph loop
 ORIGINAL_PROMPT=$(jq -r '.original_prompt' "$STATE_FILE")
 
-# Normalize prompts for comparison by stripping prefix and extra whitespace
-# 1. Strip "/ralph:loop" prefix if present
-# 2. Strip common flags like --max-iterations and --completion-promise
-# 3. Trim whitespace
-CLEAN_CURRENT=$(echo "$CURRENT_PROMPT" | sed -E 's/^\/ralph:loop[[:space:]]+//' | sed -E 's/--max-iterations[[:space:]]+[^[:space:]]+[[:space:]]*//' | sed -E 's/--completion-promise[[:space:]]+[^[:space:]]+[[:space:]]*//' | xargs)
-CLEAN_ORIGINAL=$(echo "$ORIGINAL_PROMPT" | xargs)
+# Validate that this turn belongs to the Ralph loop
+ORIGINAL_PROMPT=$(jq -r '.original_prompt' "$STATE_FILE")
 
-if [[ "$CLEAN_CURRENT" != "$CLEAN_ORIGINAL" ]]; then
-    rm -f "$STATE_FILE"
-    # Only remove directory if it is empty
-    if [[ -d "$STATE_DIR" ]]; then
-        rmdir "$STATE_DIR" 2>/dev/null || true
+if [[ "$CURRENT_PROMPT" != "$ORIGINAL_PROMPT" ]]; then
+    # Normalize prompts for comparison by stripping prefix and extra whitespace
+    # 1. Strip "/ralph:loop" prefix if present
+    # 2. Strip common flags like --max-iterations and --completion-promise
+    # 3. Trim whitespace
+    CLEAN_CURRENT=$(echo "$CURRENT_PROMPT" | sed -E 's/^\/ralph:loop[[:space:]]+//' | sed -E 's/--max-iterations[[:space:]]+[^[:space:]]+[[:space:]]*//' | sed -E 's/--completion-promise[[:space:]]+[^[:space:]]+[[:space:]]*//' | xargs)
+    CLEAN_ORIGINAL=$(echo "$ORIGINAL_PROMPT" | xargs)
+
+    if [[ "$CLEAN_CURRENT" != "$CLEAN_ORIGINAL" ]]; then
+        rm -f "$STATE_FILE"
+        # Only remove directory if it is empty
+        if [[ -d "$STATE_DIR" ]]; then
+            rmdir "$STATE_DIR" 2>/dev/null || true
+        fi
+        echo "{\"decision\": \"allow\", \"systemMessage\": \"🚨 Ralph detected a prompt mismatch. Expected: '$CLEAN_ORIGINAL', Got: '$CLEAN_CURRENT'\"}"
+        exit 0
     fi
-    echo '{"decision": "allow", "systemMessage": "Prompt mismatch between Ralph loops."}'
-    exit 0
 fi
 
 ACTIVE=$(jq -r '.active' "$STATE_FILE")

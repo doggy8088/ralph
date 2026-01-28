@@ -89,8 +89,8 @@ if [[ $(echo "$RESPONSE" | jq -r '.decision') != "allow" ]]; then
     echo "FAIL: Expected decision to be 'allow' for unrelated prompt"
     exit 1
 fi
-if [[ $(echo "$RESPONSE" | jq -r '.systemMessage') != "null" ]]; then
-    echo "FAIL: Ghost loop cleanup should be silent"
+if [[ $(echo "$RESPONSE" | jq -r '.systemMessage') != "🚨 Ralph detected a prompt mismatch. Expected: 'Task', Got: 'What is the capital of France?'" ]]; then
+    echo "FAIL: Ghost loop cleanup should show mismatch message"
     exit 1
 fi
 
